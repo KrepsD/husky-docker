@@ -1,0 +1,136 @@
+serial_number: a200-1077
+version: 0
+system:
+  username: robot
+  hosts:
+    - hostname: cpr-a200-1077
+      ip: 192.168.131.1
+  ros2:
+    namespace: a200_1077
+    domain_id: 0
+    middleware:
+      implementation: rmw_fastrtps_cpp
+      discovery: server
+      servers:
+        - hostname: cpr-a200-1077
+          port: 11811
+          enabled: True
+    workspaces: []
+platform:
+  attachments:
+    - name: front_bumper
+      type: a200.bumper
+      model: default
+      parent: front_bumper_mount
+    - name: rear_bumper
+      type: a200.bumper
+      model: default
+      parent: rear_bumper_mount
+    - name: top_plate
+      type: a200.top_plate
+      model: large
+      parent: default_mount
+    - name: sensor_arch
+      type: a200.sensor_arch
+      model: sensor_arch_300
+      parent: default_mount
+  extras:
+    urdf:
+      package: fees02_description
+      path: urdf/robot_description.urdf.xacro
+links:
+  box:
+    - name: user_bay_cover
+      parent: top_plate_link
+      xyz: [0.0, 0.0, 0.00735]
+      rpy: [0.0, 0.0, 0.0]
+      size: [0.4, 0.4, 0.002]
+mounts:
+  fath_pivot:
+    - parent: top_plate_front_mount
+      xyz: [-0.07, 0.0, 0.0]
+      rpy: [0.0, 0.0, 0.0]
+      angle: 0.0
+sensors:
+  camera:
+    - model: intel_realsense
+      urdf_enabled: true
+      launch_enabled: true
+      parent: fath_pivot_0_mount
+      xyz: [0.0, 0.0, 0.0]
+      rpy: [0.0, 0.0, 0.0]
+      ros_parameters:
+        intel_realsense:
+          camera_name: camera_0
+          device_type: d456
+          serial_no: '333422303356'
+          enable_color: true
+          rgb_camera.profile: 1280,800,30
+          enable_depth: true
+          depth_module.profile: 1280,720,30
+          pointcloud.enable: true
+  lidar3d:
+    - model: ouster_os1
+      urdf_enabled: true
+      launch_enabled: true
+      parent: sensor_arch_mount
+      xyz: [0.0, 0.0, 0.07111]
+      rpy: [0.0, 0.0, 0.0]
+      ros_parameters:
+        ouster_driver:
+          sensor_hostname: 192.168.131.20
+          udp_dest: 192.168.131.1
+          lidar_port: 7502
+          imu_port: 7503
+          proc_mask: IMU|PCL|SCAN|IMG|RAW|TLM
+          use_system_default_qos: false
+          cap_type: fins
+  ins:
+    - model: fixposition
+      urdf_enabled: false
+      launch_enabled: false
+      parent: sensor_arch_mount
+      xyz: [-0.01, 0.0, 0.0064]
+      rpy: [0.0, 0.0, 0.0]
+      antennas:
+        - type: spherical
+          parent: sensor_arch_mount
+          xyz: [-0.041, 0.235, 0.01975]
+        - type: spherical
+          parent: sensor_arch_mount
+          xyz: [-0.041, -0.235, 0.01975]
+      ros_parameters:
+        fixposition_driver:
+          stream: tcpcli://192.168.131.35:21000
+          messages:
+            - "FP_A-ODOMETRY"
+            - "FP_A-ODOMENU"
+            - "FP_A-ODOMSH"
+            - "FP_A-ODOMSTATUS"
+            - "FP_A-IMUBIAS"
+            - "FP_A-EOE"
+            - "FP_A-TF"
+            - "FP_A-RAWIMU"
+            - "FP_A-CORRIMU"
+            - "FP_A-LLH"
+            - "NOV_B-INSPVAX"
+            - "FP_A-TEXT"
+            - "FP_A-GNSSANT"
+            - "FP_A-GNSSCORR"
+            - "FP_A-TP"
+            - "FP_A-TF_VRTKCAM"
+            - "FP_A-TF_POIVRTK"
+            - "FP_A-TF_ECEFENU0"
+            - "FP_A-TF_POIPOISH"
+            - "FP_A-TF_POIIMUH"
+            - "GGA"
+            - "GLL"
+            - "GSA"
+            - "GST"
+            - "GSV"
+            - "HDT"
+            - "RMC"
+            - "VTG"
+            - "ZDA"
+            - "NOV_B-BESTGNSSPOS"
+          nmea_epoch: "FUSION"

@@ -1,0 +1,26 @@
+services:
+  sim:
+    build: .
+    image: husky-a200-jazzy:local
+    init: true
+    shm_size: 2gb
+    ports:
+      - "127.0.0.1:6080:6080"
+    volumes:
+      - ./ros_ws/src:/workspaces/ros_ws/src
+      - ros_build:/workspaces/ros_ws/build
+      - ros_install:/workspaces/ros_ws/install
+      - ros_log:/workspaces/ros_ws/log
+      - robot_setup:/runtime/clearpath
+    environment:
+      RMW_IMPLEMENTATION: rmw_zenoh_cpp
+      ROS_SUPER_CLIENT: "True"
+      ROS_DOMAIN_ID: "0"
+    stdin_open: true
+    tty: true
+
+volumes:
+  ros_build:
+  ros_install:
+  ros_log:
+  robot_setup:

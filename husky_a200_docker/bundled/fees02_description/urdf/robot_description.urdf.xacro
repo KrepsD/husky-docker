@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+<!-- Add Mount Plates Link -->
+<link name="plates_link">
+  <visual>
+    <material name="clearpath_black"/>
+    <geometry>
+      <mesh filename="package://fees02_description/meshes/arch_plates.stl"/>
+    </geometry>
+  </visual>
+  <collision>
+    <material name="clearpath_black"/>
+    <geometry>
+      <mesh filename="package://fees02_description/meshes/arch_plates.stl"/>
+    </geometry>
+  </collision>
+</link>
+
+<!-- Add Mount Plates Joint -->
+<joint name="paltes_joint" type="fixed">
+  <child link="plates_link"/>
+  <parent link="sensor_arch_mount"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+
+<!-- Add Antenna Mounts Link -->
+<link name="antenna_mounts_link">
+  <visual>
+    <material name="clearpath_light_grey"/>
+    <geometry>
+      <mesh filename="package://fees02_description/meshes/antenna_brackets.stl"/>
+    </geometry>
+  </visual>
+  <collision>
+    <material name="clearpath_light_grey"/>
+    <geometry>
+      <mesh filename="package://fees02_description/meshes/antenna_brackets.stl"/>
+    </geometry>
+  </collision>
+</link>
+
+<!-- Add Antenna Mounts Joint -->
+<joint name="antenna_mounts_joint" type="fixed">
+  <child link="antenna_mounts_link"/>
+  <parent link="sensor_arch_mount"/>
+  <origin xyz="0 0 0" rpy="0 0 0"/>
+</joint>
+
+</robot>
+
