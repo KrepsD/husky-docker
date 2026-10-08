@@ -1,99 +1,113 @@
-# Husky A200 Docker no Windows (WSL2)
+# Husky A200 — Docker (ROS 2 Jazzy)
 
-## 1. Instalar WSL2 e Ubuntu
+Execute a simulação do Husky A200 com **Gazebo, RViz2, Nav2 e SLAM** no Windows ou Ubuntu.
 
-Abra o **PowerShell como administrador** e instale o Ubuntu:
+**Requisitos:** computador `x86_64/amd64`, conexão à internet e **40 GB livres recomendados** durante a instalação (o uso real pode ser menor). Recomenda-se também **8 GB de RAM livres** para a simulação.
+
+## Windows 10/11
+
+**1. Instale o Ubuntu no WSL2** pelo PowerShell (como administrador):
 
 ```powershell
 wsl --install -d Ubuntu-24.04
 ```
 
-Reinicie o Windows se solicitado e abra o Ubuntu pelo menu Iniciar (ou com o comando abaixo no PowerShell):
+Reinicie o Windows se solicitado e abra **Ubuntu** pelo menu Iniciar. Configure o usuário na primeira execução.
 
 ```powershell
 wsl -d Ubuntu-24.04
 ```
 
-## 2. Instalar Docker Desktop
+**2. Instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/)** e ative **Settings (símbolo de engrenagem) → Resources → WSL Integration → Ubuntu-24.04**.
 
-Instale o [Docker Desktop](https://www.docker.com/products/docker-desktop/) e ative **Settings → Resources → WSL Integration → Ubuntu-24.04**.
-
-No terminal Ubuntu, verifique se o Docker está disponível:
+**3. No terminal Ubuntu (WSL2), baixe o projeto:**
 
 ```bash
-docker compose version
+git clone https://github.com/KrepsD/husky-docker.git
+cd husky-docker/husky_a200_docker
 ```
 
-## 3. Baixar o projeto
-
-No Ubuntu, instale o Git:
-
-```bash
-sudo apt update && sudo apt install -y git
-```
-
-Clone o repositório:
-
-```bash
-cd ~ && git clone https://github.com/KrepsD/husky-docker.git
-```
-
-Entre na pasta do projeto:
-
-```bash
-cd ~/husky-docker/husky_a200_docker
-```
-
-## 4. Iniciar a simulação
-
-Construa a imagem e inicie o contêiner:
+**4. Baixe os pacotes e inicie a simulação:**
 
 ```bash
 docker compose up --build
 ```
 
-Abra a interface gráfica no navegador do Windows:
+**5. Abra a interface gráfica no navegador:** http://localhost:6080/vnc.html?autoconnect=true
 
-http://localhost:6080/vnc.html?autoconnect=true
-
-## 5. Acessar o ROS 2
-
-Abra **outro terminal Ubuntu** e entre na pasta do projeto:
-
-```bash
-cd ~/husky-docker/husky_a200_docker
-```
-
-Entre no contêiner:
-
-```bash
-docker compose exec sim bash
-```
-
-Liste os tópicos ROS 2:
-
-```bash
-ros2 topic list
-```
-
-Saia do contêiner:
-
-```bash
-exit
-```
-
-## 6. Parar e reiniciar
-
-Pare a simulação com **Ctrl+C** no primeiro terminal ou execute:
-
-```bash
-docker compose down
-```
-
-Para iniciar novamente sem reconstruir a imagem:
+**6. Para finalizar a execução, dê ctrl + c no terminal que está rodando o docker, e caso queira rodar novamente, utilize o comando:**
 
 ```bash
 docker compose up
 ```
 
-> **Nota:** execute os comandos Docker no terminal Ubuntu (WSL2), com o Docker Desktop aberto. O projeto foi validado em Ubuntu Linux; a execução no Windows/WSL2 pode exigir ajustes.
+## Ubuntu (instalado diretamente no computador)
+
+**1. Instale o Docker Engine e o Compose** seguindo o [guia oficial para Ubuntu](https://docs.docker.com/engine/install/ubuntu/). Confirme a instalação:
+
+```bash
+sudo docker compose version
+```
+
+**2. Baixe o projeto:**
+
+```bash
+git clone https://github.com/KrepsD/husky-docker.git
+cd husky-docker/husky_a200_docker
+```
+
+**3. Inicie a simulação:**
+
+```bash
+sudo docker compose up --build
+```
+
+**4. Abra a interface gráfica no navegador:** http://localhost:6080/vnc.html?autoconnect=true
+
+> No Ubuntu, se você [configurar o Docker para uso sem `sudo`](https://docs.docker.com/engine/install/linux-postinstall/), poderá usar `docker compose` diretamente.
+
+## Comandos úteis
+
+**Abra outro terminal na pasta `husky_a200_docker` e liste os tópicos ROS 2:**
+
+```bash
+# Windows (WSL2)
+docker compose exec sim bash
+# Ubuntu nativo: use sudo docker compose exec sim bash, se necessário
+ros2 topic list
+```
+
+**Pare os serviços** com `Ctrl+C` no terminal do Compose ou execute:
+
+```bash
+# No Ubuntu nativo, acrescente sudo se necessário
+docker compose down
+```
+
+**Inicie novamente** sem reconstruir a imagem:
+
+```bash
+docker compose up
+```
+
+## Compatibilidade e espaço
+
+- **Windows:** requer Docker Desktop com WSL2.
+- **Ubuntu 22.04/24.04/26.04:** o Docker executa o ROS 2 Jazzy dentro do contêiner; a versão do Ubuntu hospedeiro não precisa ser 24.04. A instalação do Docker deve ser compatível com sua versão.
+- **Ubuntu 20.04:** não é uma opção recomendada para uma nova instalação do Docker Engine, por ausência de suporte oficial atual.
+- **Disco:** reserve **cerca de 40 GB livres** para build, imagens, cache e volumes; não é o tamanho fixo da instalação. No Ubuntu nativo, normalmente há menos sobrecarga que no Windows com WSL2/Docker Deskto
+
+
+## Requisitos de hardware
+
+| Componente | Mínimo para tentar rodar | Recomendado |
+|---|---|---|
+| **Processador** | Intel Core i5 ou Ryzen 5, 4 núcleos | Intel Core i7 ou Ryzen 7, 6–8 núcleos |
+| **Arquitetura** | x86_64 (64 bits) | x86_64 (64 bits) |
+| **Memória RAM** | 8 GB totais (limitante) | 16 GB ou mais |
+| **Armazenamento livre** | 30 GB | 40–60 GB em SSD |
+| **Placa de vídeo** | Integrada | Dedicada ou integrada moderna |
+| **Sistema operacional** | Ubuntu compatível ou Windows com WSL2 | Ubuntu 24.04 LTS |
+
+**Observação:** Os requisitos são estimativas para executar o Gazebo, RViz2, Nav2 e SLAM Toolbox simultaneamente. A configuração atual utiliza renderização gráfica por software, portanto não exige GPU dedicada. Recomenda-se pelo menos 8 GB de RAM livres.
+
