@@ -14,7 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-nav2-bringup \
     ros-jazzy-navigation2 \
     ros-jazzy-slam-toolbox \
+    ros-jazzy-cv-bridge \
     python3-colcon-common-extensions \
+    python3-pip \
     python3-rosdep \
     build-essential \
     xvfb x11vnc novnc websockify openbox dbus-x11 \
@@ -25,6 +27,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ros-jazzy-spatio-temporal-voxel-layer \
     && rm -rf /var/lib/apt/lists/*
+
+# CPU-only para funcionar também sem GPU no host. O Python do ROS 2 usa
+# /usr/bin/python3, então as bibliotecas ficam no mesmo interpretador.
+# NumPy 1.x preserva a compatibilidade binária com o cv_bridge do Jazzy.
+RUN python3 -m pip install --no-cache-dir --break-system-packages \
+      --index-url https://download.pytorch.org/whl/cpu \
+      torch==2.14.1+cpu torchvision==0.29.1+cpu \
+    && python3 -m pip install --no-cache-dir --break-system-packages \
+      --ignore-installed typing-extensions==4.16.0 \
+    && python3 -m pip install --no-cache-dir --break-system-packages \
+      'numpy<2' 'opencv-python-headless<4.12' \
+      ultralytics-opencv-headless==8.4.177 \
+    && mkdir -p /opt/husky/models \
+    && cd /opt/husky/models \
+    && python3 -c 'from ultralytics import YOLO; YOLO("yolo26n.pt")'
 
 # Cópias das alterações locais da simulação; o projeto original não é editado.
 COPY overrides/ /opt/ros/jazzy/share/

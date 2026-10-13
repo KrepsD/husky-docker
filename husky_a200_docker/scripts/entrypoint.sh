@@ -20,6 +20,8 @@ if [[ "${1:-}" != sim ]]; then
 fi
 
 cp /opt/husky_config/robot.yaml /runtime/clearpath/robot.yaml
+world="${HUSKY_WORLD:-warehouse}"
+python3 /opt/husky/scripts/prefetch-world.py "$world"
 
 Xvfb :1 -screen 0 1920x1080x24 -nolisten tcp &
 xvfb_pid=$!
@@ -35,7 +37,8 @@ ros2 run rmw_zenoh_cpp rmw_zenohd &
 zenoh_pid=$!
 sleep 3
 
-ros2 launch clearpath_gz simulation.launch.py setup_path:=/runtime/clearpath &
+ros2 launch clearpath_gz simulation.launch.py \
+  setup_path:=/runtime/clearpath world:="$world" &
 gazebo_pid=$!
 sleep 15
 

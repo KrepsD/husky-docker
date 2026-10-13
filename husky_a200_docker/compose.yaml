@@ -12,7 +12,9 @@ services:
       - ros_install:/workspaces/ros_ws/install
       - ros_log:/workspaces/ros_ws/log
       - robot_setup:/runtime/clearpath
+      - gazebo_fuel:/root/.gz/fuel
     environment:
+      HUSKY_WORLD: ${HUSKY_WORLD:-warehouse}
       RMW_IMPLEMENTATION: rmw_zenoh_cpp
       ROS_SUPER_CLIENT: "True"
       ROS_DOMAIN_ID: "0"
@@ -24,3 +26,4 @@ volumes:
   ros_install:
   ros_log:
   robot_setup:
+  gazebo_fuel:
